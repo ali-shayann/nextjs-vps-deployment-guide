@@ -1,3 +1,7 @@
+> 🔍 Keywords: deploy next.js to vps, node.js vps deployment, ssh deployment guide,
+> pm2 tutorial, cpanel node.js, godaddy vps nextjs, linux server deployment
+
+[![Stars](https://img.shields.io/github/stars/nowshad7/nextjs-vps-deployment-guide?style=social)](https://github.com/nowshad7/nextjs-vps-deployment-guide)
 # 🚀 Deploying a Next.js / Node.js App to VPS via SSH
 
 A step-by-step deployment guide for junior developers.  
