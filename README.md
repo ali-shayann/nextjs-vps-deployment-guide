@@ -9,6 +9,15 @@ A step-by-step deployment guide for junior developers.
 
 ---
 
+## 🎯 Who is this for?
+
+This guide is for developers who want to:
+- Deploy a Next.js or Node.js app to a VPS for the first time
+- Use GoDaddy VPS, DigitalOcean, Linode, or any Linux server
+- Set up PM2 for process management
+- Configure Apache or Nginx as a reverse proxy
+- Get HTTPS/SSL working on their server
+
 ## 📋 Table of Contents
 
 - [Prerequisites](#prerequisites)
