@@ -343,11 +343,6 @@ df -h && free -h                          # disk + memory
 
 **`nextjs`** &nbsp;·&nbsp; **`nodejs`** &nbsp;·&nbsp; **`vps`** &nbsp;·&nbsp; **`apache`** &nbsp;·&nbsp; **`cpanel`** &nbsp;·&nbsp; **`pm2`** &nbsp;·&nbsp; **`deployment`** &nbsp;·&nbsp; **`devops`**
 
-<br/>
-
-[![Read the full styled article](https://img.shields.io/badge/Read%20Full%20Article-%20GitHub%20Pages%20→-f4a261?style=for-the-badge&labelColor=1a1a2e)](https://nowshad7.github.io/nextjs-vps-deployment-guide/medium-article.html)
-
-<br/>
 
 *Made for junior developers. If this helped you, consider giving it a ⭐ — it helps others find it too.*
 
