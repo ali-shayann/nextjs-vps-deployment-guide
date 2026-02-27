@@ -9,7 +9,6 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-0e9f6e?style=flat-square&labelColor=1a1a2e)](LICENSE)
 [![Platform](https://img.shields.io/badge/Platform-Linux%20VPS-3b82f6?style=flat-square&labelColor=1a1a2e)](https://github.com/nowshad7/nextjs-vps-deployment-guide)
 [![Node](https://img.shields.io/badge/Node.js-18%2B-14b8a6?style=flat-square&labelColor=1a1a2e)](https://github.com/nowshad7/nextjs-vps-deployment-guide)
-[![Read Article](https://img.shields.io/badge/Read%20Full%20Article-GitHub%20Pages-f4a261?style=flat-square&labelColor=1a1a2e)](https://nowshad7.github.io/nextjs-vps-deployment-guide/medium-article.html)
 
 <br/>
 
