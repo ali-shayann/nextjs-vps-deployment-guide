@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deploy Next.js on a VPS — Medium Article Draft</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #1a1a2e;
+    --mid: #4a4a6a;
+    --soft: #8888aa;
+    --bg: #fafaf8;
+    --card: #ffffff;
+    --accent: #5b4fcf;
+    --accent2: #e8650a;
+    --green: #0e9f6e;
+    --red: #e53e3e;
+    --border: #e8e8f0;
+    --code-bg: #f0f0f8;
+  }
+
+  body {
+    font-family: 'Source Serif 4', Georgia, serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.8;
+    font-size: 18px;
+  }
+
+  /* HEADER */
+  .hero {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    padding: 80px 24px 60px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 30% 50%, rgba(91,79,207,0.3) 0%, transparent 60%),
+                radial-gradient(circle at 70% 30%, rgba(232,101,10,0.2) 0%, transparent 50%);
+  }
+  .hero-tag {
+    display: inline-block;
+    background: rgba(91,79,207,0.4);
+    border: 1px solid rgba(91,79,207,0.6);
+    color: #c4b9ff;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: 20px;
+    margin-bottom: 24px;
+    position: relative;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 5vw, 54px);
+    font-weight: 900;
+    color: #ffffff;
+    line-height: 1.15;
+    max-width: 720px;
+    margin: 0 auto 20px;
+    position: relative;
+  }
+  .hero h1 span { color: #f4a261; }
+  .hero-sub {
+    color: #a8b2d0;
+    font-size: 17px;
+    font-style: italic;
+    font-weight: 300;
+    max-width: 500px;
+    margin: 0 auto 32px;
+    position: relative;
+  }
+  .meta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    font-size: 13px;
+    color: #7080a0;
+    font-family: 'JetBrains Mono', monospace;
+    position: relative;
+  }
+  .meta-dot { color: #3a4060; }
+
+  /* ARTICLE BODY */
+  .article {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 56px 24px 80px;
+  }
+
+  h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--ink);
+    margin: 52px 0 16px;
+    line-height: 1.25;
+  }
+  h2:first-of-type { margin-top: 0; }
+
+  p { margin-bottom: 20px; color: #2a2a4a; }
+
+  .lead {
+    font-size: 20px;
+    font-weight: 300;
+    color: var(--mid);
+    font-style: italic;
+    border-left: 3px solid var(--accent);
+    padding-left: 20px;
+    margin-bottom: 40px;
+    line-height: 1.7;
+  }
+
+  /* FLOWCHART */
+  .flowchart-wrap {
+    background: linear-gradient(135deg, #0d0d1a 0%, #1a1040 100%);
+    border-radius: 16px;
+    padding: 40px 24px;
+    margin: 40px 0;
+    overflow-x: auto;
+  }
+  .flowchart-title {
+    text-align: center;
+    color: #8888bb;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 32px;
+  }
+  .fc {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    min-width: 340px;
+  }
+
+  /* nodes */
+  .fc-node {
+    border-radius: 10px;
+    padding: 10px 22px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    text-align: center;
+    line-height: 1.4;
+    min-width: 200px;
+    max-width: 280px;
+    position: relative;
+  }
+  .fc-node.green  { background: #0d2e22; border: 1.5px solid #0e9f6e; color: #4ade80; }
+  .fc-node.purple { background: #1e1040; border: 1.5px solid #5b4fcf; color: #a78bfa; }
+  .fc-node.orange { background: #2e1a08; border: 1.5px solid #e8650a; color: #fb923c; }
+  .fc-node.blue   { background: #081828; border: 1.5px solid #3b82f6; color: #60a5fa; }
+  .fc-node.teal   { background: #062020; border: 1.5px solid #14b8a6; color: #2dd4bf; }
+  .fc-node.pink   { background: #2a0a18; border: 1.5px solid #ec4899; color: #f472b6; }
+  .fc-node.gold   { background: #201400; border: 1.5px solid #f59e0b; color: #fcd34d; }
+  .fc-node.lime   { background: #0c1e08; border: 1.5px solid #84cc16; color: #a3e635; }
+
+  .fc-arrow {
+    width: 2px;
+    height: 22px;
+    background: #3a3a5a;
+    position: relative;
+    margin: 0 auto;
+  }
+  .fc-arrow::after {
+    content: '▼';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    color: #3a3a5a;
+    line-height: 1;
+  }
+
+  .fc-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: #555580;
+    margin: 3px 0;
+    text-align: center;
+    letter-spacing: 0.5px;
+  }
+
+  /* section box */
+  .fc-section {
+    border: 1px solid #2a2a4a;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin: 4px 0;
+    width: 100%;
+    max-width: 340px;
+  }
+  .fc-section-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: #555580;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    text-align: center;
+  }
+  .fc-section.vps-section { border-color: #2a2060; background: rgba(91,79,207,0.05); }
+  .fc-section.apache-section { border-color: #2e1a08; background: rgba(232,101,10,0.05); }
+  .fc-inner { display: flex; flex-direction: column; align-items: center; gap: 0; }
+
+  /* CODE */
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    overflow-x: auto;
+    margin: 24px 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    color: #2a2a4a;
+  }
+  code { font-family: 'JetBrains Mono', monospace; font-size: 0.88em; }
+  p code, li code {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    padding: 2px 7px;
+    border-radius: 4px;
+    color: var(--accent);
+  }
+
+  /* CALLOUT */
+  .callout {
+    background: #f5f3ff;
+    border-left: 4px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+    padding: 16px 20px;
+    margin: 24px 0;
+    font-size: 15px;
+    color: #3a3060;
+  }
+  .callout.warn {
+    background: #fff7ed;
+    border-color: var(--accent2);
+    color: #5a3010;
+  }
+  .callout strong { display: block; margin-bottom: 4px; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; }
+
+  /* STEPS */
+  .steps { counter-reset: step; margin: 24px 0; }
+  .step {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 20px;
+    align-items: flex-start;
+  }
+  .step-num {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    background: var(--accent);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    margin-top: 2px;
+  }
+  .step-num.orange { background: var(--accent2); }
+  .step-num.green  { background: var(--green); }
+  .step-body h3 { font-size: 17px; font-family: 'Playfair Display', serif; margin-bottom: 4px; }
+  .step-body p  { margin-bottom: 0; font-size: 16px; }
+
+  /* DIVIDER */
+  .divider {
+    border: none;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--border), transparent);
+    margin: 48px 0;
+  }
+
+  /* TAGS */
+  .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 48px; }
+  .tag {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--mid);
+  }
+
+  /* FOOTER */
+  .article-footer {
+    background: var(--ink);
+    color: #8888aa;
+    text-align: center;
+    padding: 40px 24px;
+    font-size: 14px;
+    font-style: italic;
+  }
+  .article-footer strong { color: #c4b9ff; font-style: normal; }
+
+  @media (max-width: 480px) {
+    .hero { padding: 60px 16px 40px; }
+    .article { padding: 40px 16px 60px; }
+    h2 { font-size: 24px; }
+    .fc-node { font-size: 12px; min-width: 160px; padding: 8px 14px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-tag">Dev Tutorial</div>
+  <h1>How to Deploy a <span>Next.js App</span> on a VPS with Apache</h1>
+  <p class="hero-sub">A no-fluff, beginner-friendly guide using PM2, cPanel, and a proper reverse proxy</p>
+  <div class="meta">
+    <span>5 min read</span>
+    <span class="meta-dot">·</span>
+    <span>DevOps</span>
+    <span class="meta-dot">·</span>
+    <span>Next.js</span>
+    <span class="meta-dot">·</span>
+    <span>Apache</span>
+  </div>
+</div>
+
+<!-- ARTICLE -->
+<article class="article">
+
+  <p class="lead">You've built a Next.js app. Now what? Getting it live on a real server trips up a lot of developers. This guide walks you through the whole thing — from SSH to a working HTTPS domain — in under 30 minutes.</p>
+
+  <!-- FLOWCHART -->
+  <div class="flowchart-wrap">
+    <div class="flowchart-title">// deployment pipeline</div>
+    <div class="fc">
+
+      <div class="fc-node green">💻 Your Local Machine</div>
+      <div class="fc-arrow"></div>
+      <div class="fc-label">git push</div>
+      <div class="fc-arrow" style="height:10px"></div>
+
+      <div class="fc-node purple">🐙 GitHub Repository</div>
+      <div class="fc-arrow"></div>
+      <div class="fc-label">SSH in + git clone</div>
+      <div class="fc-arrow" style="height:10px"></div>
+
+      <div class="fc-section vps-section">
+        <div class="fc-section-title">⚡ VPS Server</div>
+        <div class="fc-inner">
+          <div class="fc-node blue">📦 Install Node.js via NVM</div>
+          <div class="fc-arrow"></div>
+          <div class="fc-node blue">🔧 npm install + npm run build</div>
+          <div class="fc-arrow"></div>
+          <div class="fc-node teal">🔄 PM2 — App running on :3000</div>
+          <div class="fc-arrow"></div>
+          <div class="fc-label">reverse proxy</div>
+          <div class="fc-arrow" style="height:10px"></div>
+
+          <div class="fc-section apache-section">
+            <div class="fc-section-title">🌐 Apache / cPanel WHM</div>
+            <div class="fc-inner">
+              <div class="fc-node orange">📁 Create userdata/proxy.conf</div>
+              <div class="fc-arrow"></div>
+              <div class="fc-node orange">🔁 Copy config for SSL vhost</div>
+              <div class="fc-arrow"></div>
+              <div class="fc-node orange">⚙️ Rebuild Apache config</div>
+            </div>
+          </div>
+
+          <div class="fc-arrow"></div>
+          <div class="fc-node pink">🔒 SSL via AutoSSL / Let's Encrypt</div>
+        </div>
+      </div>
+
+      <div class="fc-arrow"></div>
+      <div class="fc-node lime">🌍 yourdomain.com — Live on HTTPS</div>
+    </div>
+  </div>
+
+  <h2>What you need before starting</h2>
+  <p>You'll need a Linux VPS (AlmaLinux, Ubuntu, or Debian all work), a domain pointed at your server's IP, cPanel/WHM access, and your Next.js app pushed to a GitHub repo. That's it.</p>
+
+  <h2>Step 1 — SSH into your server</h2>
+  <p>Open Terminal and connect:</p>
+<pre>ssh your_username@your_server_ip</pre>
+  <p>If you're on cPanel, there's also a browser terminal at <code>https://YOUR_IP:2083 → Advanced → Terminal</code>.</p>
+
+  <h2>Step 2 — Install Node.js with NVM</h2>
+  <p>NVM is the cleanest way to manage Node on a server — no sudo headaches.</p>
+<pre>curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+source ~/.bashrc
+nvm install --lts
+nvm use --lts</pre>
+
+  <h2>Step 3 — Clone, build, and start with PM2</h2>
+<pre>git clone https://github.com/YOU/YOUR_REPO.git
+cd YOUR_REPO
+nano .env.local          # add your env vars
+npm install
+npm run build
+npm install -g pm2
+pm2 start npm --name "my-app" -- start
+pm2 save && pm2 startup</pre>
+
+  <div class="callout warn">
+    <strong>Important</strong>
+    After <code>pm2 startup</code>, copy and run the full <code>sudo env PATH=...</code> command it prints. Without it, your app won't survive a reboot.
+  </div>
+
+  <p>Test it's working before touching Apache:</p>
+<pre>curl http://localhost:3000</pre>
+
+  <h2>Step 4 — Configure Apache as a reverse proxy</h2>
+  <p>This is where most tutorials go wrong. On cPanel/WHM servers, you should never edit vhost files directly — they get overwritten on every rebuild. Instead, use the <code>userdata</code> directory:</p>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h3>Create the config directories</h3>
+        <p>Replace <code>cpanelusername</code> and <code>yourdomain.com</code> with yours.</p>
+      </div>
+    </div>
+  </div>
+
+<pre>mkdir -p /etc/apache2/conf.d/userdata/std/2_4/cpanelusername/yourdomain.com
+mkdir -p /etc/apache2/conf.d/userdata/ssl/2_4/cpanelusername/yourdomain.com</pre>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num orange">2</div>
+      <div class="step-body">
+        <h3>Create the proxy config</h3>
+      </div>
+    </div>
+  </div>
+
+<pre>nano /etc/apache2/conf.d/userdata/std/2_4/cpanelusername/yourdomain.com/proxy.conf</pre>
+
+  <p>Paste this inside:</p>
+<pre>&lt;IfModule mod_proxy.c&gt;
+    ProxyPreserveHost On
+    ProxyPass / http://127.0.0.1:3000/
+    ProxyPassReverse / http://127.0.0.1:3000/
+&lt;/IfModule&gt;</pre>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num orange">3</div>
+      <div class="step-body">
+        <h3>Copy the config for SSL</h3>
+      </div>
+    </div>
+  </div>
+
+<pre>cp /etc/apache2/conf.d/userdata/std/2_4/cpanelusername/yourdomain.com/proxy.conf \
+   /etc/apache2/conf.d/userdata/ssl/2_4/cpanelusername/yourdomain.com/</pre>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num green">4</div>
+      <div class="step-body">
+        <h3>Rebuild Apache</h3>
+      </div>
+    </div>
+  </div>
+
+<pre>/scripts/ensure_vhost_includes --all-users
+/scripts/rebuildhttpdconf
+/scripts/restartsrv_httpd</pre>
+
+  <div class="callout">
+    <strong>Why this approach?</strong>
+    Files in <code>userdata/</code> survive cPanel/WHM updates and Apache rebuilds. Editing vhosts directly gets overwritten. This is the correct, production-safe way.
+  </div>
+
+  <h2>Step 5 — Enable SSL</h2>
+  <p>In cPanel, go to <strong>Security → SSL/TLS Status</strong> and click <strong>Run AutoSSL</strong>. A free Let's Encrypt certificate will be applied within a minute or two. Done.</p>
+
+  <hr class="divider">
+
+  <h2>Deploying updates</h2>
+  <p>Every time you push new code, SSH in and run:</p>
+<pre>cd ~/YOUR_REPO && git pull && npm install && npm run build && pm2 restart my-app</pre>
+  <p>Or save the above as a <code>deploy.sh</code> script and run it with a single <code>./deploy.sh</code>.</p>
+
+  <hr class="divider">
+
+  <h2>Quick troubleshooting</h2>
+  <p>If something isn't working, these commands will tell you almost everything you need to know:</p>
+<pre>pm2 logs my-app                              # app errors
+curl http://localhost:3000                   # is the app responding?
+tail -f /usr/local/apache/logs/error_log    # apache errors
+lsof -i :3000                               # is port 3000 in use?</pre>
+
+  <p>The most common issue is the proxy config not applying after an Apache rebuild. Just re-run <code>/scripts/ensure_vhost_includes --all-users</code> and rebuild again.</p>
+
+  <hr class="divider">
+
+  <p>That's the whole flow. Once you've done it once it takes less than 10 minutes the next time. The full guide with a PM2 cheatsheet, Apache command reference, and security checklist is on GitHub if you want to go deeper.</p>
+
+  <div class="tags">
+    <span class="tag">nextjs</span>
+    <span class="tag">nodejs</span>
+    <span class="tag">vps</span>
+    <span class="tag">apache</span>
+    <span class="tag">cpanel</span>
+    <span class="tag">pm2</span>
+    <span class="tag">deployment</span>
+    <span class="tag">devops</span>
+  </div>
+
+</article>
+
+<div class="article-footer">
+  <strong>Found this useful?</strong> — Clap, share, and check out the full guide on GitHub for the complete cheatsheets and deploy script.
+</div>
+
+</body>
+</html>
