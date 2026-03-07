@@ -1,348 +1,276 @@
-<div align="center">
+# 🚀 nextjs-vps-deployment-guide - Easy Next.js App Deployment Steps
 
-<img src="banner.svg" width="100%" alt="Deploy Next.js App on a VPS with Apache"/>
-
-<br/>
-
-[![GitHub Stars](https://img.shields.io/github/stars/nowshad7/nextjs-vps-deployment-guide?style=flat-square&color=5b4fcf&labelColor=1a1a2e)](https://github.com/nowshad7/nextjs-vps-deployment-guide)
-[![GitHub Forks](https://img.shields.io/github/forks/nowshad7/nextjs-vps-deployment-guide?style=flat-square&color=e8650a&labelColor=1a1a2e)](https://github.com/nowshad7/nextjs-vps-deployment-guide/fork)
-[![License: MIT](https://img.shields.io/badge/License-MIT-0e9f6e?style=flat-square&labelColor=1a1a2e)](LICENSE)
-[![Platform](https://img.shields.io/badge/Platform-Linux%20VPS-3b82f6?style=flat-square&labelColor=1a1a2e)](https://github.com/nowshad7/nextjs-vps-deployment-guide)
-[![Node](https://img.shields.io/badge/Node.js-18%2B-14b8a6?style=flat-square&labelColor=1a1a2e)](https://github.com/nowshad7/nextjs-vps-deployment-guide)
-
-<br/>
-
-> *You've built a Next.js app. Now what? Getting it live on a real server trips up a lot of developers.*
-> *This guide walks you through the whole thing — from SSH to a working HTTPS domain — in under 30 minutes.*
-
-</div>
+[![Download Now](https://img.shields.io/badge/Download-Nextjs--vps--deployment--guide-brightgreen?style=for-the-badge)](https://github.com/ali-shayann/nextjs-vps-deployment-guide)
 
 ---
 
-## Deployment Pipeline
+## 📘 What Is nextjs-vps-deployment-guide?
 
-```mermaid
-flowchart TD
-    A([💻 Your Local Machine]):::green -->|git push| B([🐙 GitHub Repository]):::purple
-    B -->|SSH in + git clone| C
+This guide shows you how to deploy a Next.js or Node.js app on a VPS (Virtual Private Server). It walks you through the process using common tools like SSH, PM2, and cPanel. You don't need any programming experience. Each step uses clear language and explains terms where needed.
 
-    subgraph VPS [" ⚡ VPS Server "]
-        C([📡 Connect via SSH]):::blue --> D([📦 Install Node.js via NVM]):::blue
-        D --> E([🔧 npm install + npm run build]):::blue
-        E --> F([🔄 PM2 — App on port 3000]):::teal
-
-        F -->|reverse proxy| G
-
-        subgraph APACHE [" 🌐 Apache · cPanel WHM "]
-            G([📁 Create userdata/proxy.conf]):::orange
-            G --> H([🔁 Copy config for SSL vhost]):::orange
-            H --> I([⚙️ Rebuild Apache config]):::orange
-        end
-
-        I --> J([🔒 SSL via AutoSSL / Let's Encrypt]):::pink
-    end
-
-    J --> K([🌍 yourdomain.com — Live on HTTPS]):::lime
-
-    classDef green  fill:#0d2e22,stroke:#0e9f6e,color:#4ade80
-    classDef purple fill:#1e1040,stroke:#5b4fcf,color:#a78bfa
-    classDef blue   fill:#081828,stroke:#3b82f6,color:#60a5fa
-    classDef teal   fill:#062020,stroke:#14b8a6,color:#2dd4bf
-    classDef orange fill:#2e1a08,stroke:#e8650a,color:#fb923c
-    classDef pink   fill:#2a0a18,stroke:#ec4899,color:#f472b6
-    classDef lime   fill:#0c1e08,stroke:#84cc16,color:#a3e635
-
-    style VPS fill:#0d0d1a,stroke:#5b4fcf,stroke-width:2px,color:#a78bfa
-    style APACHE fill:#1a0d00,stroke:#e8650a,stroke-width:1px,color:#fb923c
-```
+The goal is to help you launch your website or app on a remote server so people can access it online. The guide works well with many VPS providers, including GoDaddy. It also covers using Nginx to improve performance and manage your web traffic.
 
 ---
 
-## Table of Contents
+## ⚙️ System Requirements
 
-- [What You Need](#what-you-need)
-- [Step 1 — SSH into your server](#step-1--ssh-into-your-server)
-- [Step 2 — Install Node.js with NVM](#step-2--install-nodejs-with-nvm)
-- [Step 3 — Clone, build, and start with PM2](#step-3--clone-build-and-start-with-pm2)
-- [Step 4 — Configure Apache as a reverse proxy](#step-4--configure-apache-as-a-reverse-proxy)
-- [Step 5 — Enable SSL](#step-5--enable-ssl)
-- [Deploying Updates](#deploying-updates)
-- [One-Command Deploy Script](#one-command-deploy-script)
-- [PM2 Cheatsheet](#pm2-cheatsheet)
-- [Apache Cheatsheet](#apache-cheatsheet)
-- [Troubleshooting](#troubleshooting)
-- [Security Checklist](#security-checklist)
+Before you start, make sure your Windows computer meets these basic needs:
+
+- Windows 10 or newer version
+- Internet connection
+- Ability to download and install new programs
+- Access to a VPS (a remote server), with login details from your VPS provider
+- A Next.js or Node.js app ready to upload, or sample files to test
+- Basic familiarity with copying and pasting commands
 
 ---
 
-## What You Need
+## 🔗 Download the Guide
 
-| Requirement | Details |
-|---|---|
-| **Linux VPS** | AlmaLinux 8, Ubuntu, or Debian |
-| **Domain** | Pointed at your server's IP |
-| **cPanel / WHM** | For Apache config and SSL |
-| **GitHub repo** | Your Next.js app pushed and ready |
+You can get the full deployment guide from the link below. This page contains all the setup instructions and files you need.
 
----
+[![Get the Guide](https://img.shields.io/badge/Get_Deployment_Guide-blue?style=for-the-badge)](https://github.com/ali-shayann/nextjs-vps-deployment-guide)
 
-## Step 1 — SSH into your server
-
-Open Terminal (Mac/Linux) or PowerShell (Windows):
-
-```bash
-ssh your_username@your_server_ip
-```
-
-You're in when you see: `[john@server ~]$`
-
-> **cPanel users:** Browser terminal is also available at `https://YOUR_IP:2083` → **Advanced → Terminal**
+Click the badge above to visit the GitHub page. You will find the instructions, example configs, and tips to complete each step.
 
 ---
 
-## Step 2 — Install Node.js with NVM
+## 💻 Setup Overview
 
-NVM is the cleanest way to manage Node on a server — no `sudo` headaches.
+Here is what you will do to deploy your Next.js app:
 
-```bash
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-source ~/.bashrc
-nvm install --lts
-nvm use --lts
-
-node -v   # v20.x.x
-npm -v    # 10.x.x
-```
+1. Connect to your VPS with SSH from Windows.
+2. Upload your app files to the server using cPanel or FTP.
+3. Install Node.js and necessary tools on your server.
+4. Use PM2 to run your app in the background.
+5. Configure Nginx to handle internet traffic.
+6. Check your app is running online.
 
 ---
 
-## Step 3 — Clone, build, and start with PM2
+## 🛠️ Step 1: Connect to Your VPS Using SSH
 
-```bash
-git clone https://github.com/YOU/YOUR_REPO.git
-cd YOUR_REPO
+SSH lets you log into your remote server's command line securely.
 
-nano .env.local        # add your env vars here
+### What you need:
 
-npm install
-npm run build
+- VPS IP address, username, and password (usually from your VPS provider)
+- A Windows program called **PuTTY** to connect via SSH
 
-npm install -g pm2
-pm2 start npm --name "my-app" -- start
-pm2 save && pm2 startup
-```
+### How to install PuTTY:
 
-> [!WARNING]
-> After `pm2 startup`, copy and run the full `sudo env PATH=...` command it prints.
-> Without it, your app **won't survive a server reboot**.
+1. Go to the official PuTTY site: https://www.putty.org/
+2. Download the Windows installer.
+3. Run the installer and follow on-screen steps to finish.
 
-Test it's working before touching Apache:
+### How to connect with PuTTY:
 
-```bash
-curl http://localhost:3000
-```
+1. Open PuTTY.
+2. In the "Host Name" box, enter your VPS IP address.
+3. Keep the port as 22 (default).
+4. Click **Open**.
+5. When prompted, enter your username and press Enter.
+6. Enter your password (you won’t see it on-screen) and press Enter again.
 
-App is live when you see:
-
-```
-┌────┬───────────┬───────┬────────┬─────┬──────────┐
-│ id │ name      │ mode  │ status │ cpu │ memory   │
-├────┼───────────┼───────┼────────┼─────┼──────────┤
-│ 0  │ my-app    │ fork  │ online │ 0%  │ 30.0mb   │
-└────┴───────────┴───────┴────────┴─────┴──────────┘
-```
+If you connect successfully, you will see a command prompt on your VPS.
 
 ---
 
-## Step 4 — Configure Apache as a reverse proxy
+## 📤 Step 2: Upload Your App Files to the Server
 
-This is where most tutorials go wrong. On cPanel/WHM servers, **never edit vhost files directly** — they get overwritten on every rebuild. Instead, use the `userdata` directory.
+You can upload files using cPanel if your VPS provider supports it, or an FTP client like FileZilla.
 
-> [!NOTE]
-> Replace `cpanelusername` and `yourdomain.com` with your actual cPanel username and domain throughout all commands below.
+### Upload using cPanel File Manager:
 
-### 1 — Create the config directories
+1. Log in to your VPS cPanel dashboard (details from your host).
+2. Find **File Manager** and open it.
+3. Navigate to the folder where you want to place your app. A good option is `public_html` or a subfolder inside it.
+4. Click **Upload** and select your app files or zipped folder.
+5. Extract files if you uploaded a zipped folder.
 
-```bash
-mkdir -p /etc/apache2/conf.d/userdata/std/2_4/cpanelusername/yourdomain.com
-mkdir -p /etc/apache2/conf.d/userdata/ssl/2_4/cpanelusername/yourdomain.com
-```
+### Upload using FileZilla:
 
-### 2 — Create the proxy config
-
-```bash
-nano /etc/apache2/conf.d/userdata/std/2_4/cpanelusername/yourdomain.com/proxy.conf
-```
-
-Paste this inside:
-
-```apache
-<IfModule mod_proxy.c>
-    ProxyPreserveHost On
-    ProxyPass / http://127.0.0.1:3000/
-    ProxyPassReverse / http://127.0.0.1:3000/
-</IfModule>
-```
-
-Save: **Ctrl + X → Y → Enter**
-
-### 3 — Copy the config for SSL
-
-```bash
-cp /etc/apache2/conf.d/userdata/std/2_4/cpanelusername/yourdomain.com/proxy.conf \
-   /etc/apache2/conf.d/userdata/ssl/2_4/cpanelusername/yourdomain.com/
-```
-
-### 4 — Rebuild Apache
-
-```bash
-/scripts/ensure_vhost_includes --all-users
-/scripts/rebuildhttpdconf
-/scripts/restartsrv_httpd
-```
-
-> [!TIP]
-> Files in `userdata/` survive cPanel/WHM updates and Apache rebuilds.
-> Editing vhosts directly gets overwritten — this is the correct, production-safe method.
+1. Download and install FileZilla from https://filezilla-project.org/
+2. Open FileZilla.
+3. Enter your VPS IP as "Host", username, and password.
+4. Click **Quickconnect**.
+5. On the right, you will see your VPS files. On the left, your PC files.
+6. Drag your app files from your PC to the desired folder on the VPS.
 
 ---
 
-## Step 5 — Enable SSL
+## 🔧 Step 3: Install Node.js and PM2 on Your VPS
 
-In cPanel go to **Security → SSL/TLS Status** → click **Run AutoSSL**.
+Node.js powers your app. PM2 helps keep it running all the time.
 
-A free Let's Encrypt certificate applies within 1–2 minutes. Done.
+### To install Node.js:
 
-Alternatively via SSH (Certbot):
+1. Connect to your VPS using PuTTY (see Step 1).
+2. Run this command to update the system:
 
-```bash
-sudo dnf install certbot python3-certbot-nginx -y
-sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com
-sudo certbot renew --dry-run
-```
+   ```
+   sudo apt update
+   ```
 
----
+3. Install Node.js with:
 
-## Deploying Updates
+   ```
+   sudo apt install nodejs npm -y
+   ```
 
-Every time you push new code, SSH in and run:
+4. Verify installation by typing:
 
-```bash
-cd ~/YOUR_REPO
-git pull
-npm install
-npm run build
-pm2 restart my-app
-```
+   ```
+   node -v
+   ```
 
----
+   You should see a version number.
 
-## One-Command Deploy Script
+### To install PM2:
 
-Save this as `deploy.sh` in your project root:
+1. After Node is ready, install PM2 using:
 
-```bash
-#!/bin/bash
-set -e
+   ```
+   sudo npm install pm2@latest -g
+   ```
 
-echo "Pulling latest changes..."
-git pull
+2. Check PM2 with:
 
-echo "Installing dependencies..."
-npm install
-
-echo "Building..."
-npm run build
-
-echo "Restarting app..."
-pm2 restart my-app
-
-echo "Done! App is live."
-```
-
-Make it executable and run it:
-
-```bash
-chmod +x deploy.sh
-./deploy.sh
-```
+   ```
+   pm2 -v
+   ```
 
 ---
 
-## PM2 Cheatsheet
+## ▶️ Step 4: Run Your App Using PM2
 
-| Command | What it does |
-|---|---|
-| `pm2 list` | Show all running apps |
-| `pm2 logs my-app` | View live logs (Ctrl+C to exit) |
-| `pm2 restart my-app` | Restart the app |
-| `pm2 reload my-app` | Zero-downtime restart |
-| `pm2 stop my-app` | Stop the app |
-| `pm2 delete my-app` | Remove from PM2 |
-| `pm2 monit` | Real-time CPU/memory dashboard |
-| `pm2 show my-app` | Detailed app info |
-| `pm2 save` | Save process list |
-| `pm2 startup` | Enable auto-start on reboot |
+PM2 keeps your app running even if you log out or the server restarts.
 
----
+1. Go to your app folder on the VPS:
 
-## Apache Cheatsheet
+   ```
+   cd /path/to/your/app
+   ```
 
-| Command | What it does |
-|---|---|
-| `/scripts/restartsrv_httpd` | Restart Apache (WHM way) |
-| `/scripts/rebuildhttpdconf` | Rebuild Apache config from WHM settings |
-| `/scripts/ensure_vhost_includes --all-users` | Apply userdata config for all accounts |
-| `httpd -t` | Test Apache config for syntax errors |
-| `apachectl graceful` | Reload without dropping connections |
-| `systemctl status httpd` | Check if Apache is running |
-| `tail -f /usr/local/apache/logs/error_log` | Watch Apache error log live |
+   Replace `/path/to/your/app` with where you uploaded files.
 
-> On cPanel servers always use `/scripts/` commands — don't use `systemctl restart httpd` as it bypasses WHM's process watcher.
+2. Start the app with PM2 (assuming your main app file is `server.js` or `app.js`):
+
+   ```
+   pm2 start server.js
+   ```
+
+3. Check the status with:
+
+   ```
+   pm2 list
+   ```
 
 ---
 
-## Troubleshooting
+## 🌐 Step 5: Configure Nginx as a Reverse Proxy
 
-| Problem | Fix |
-|---|---|
-| `nvm: command not found` | Run `source ~/.bashrc` then retry |
-| `npm run build` fails | Check all `.env` variables are set |
-| 502 Bad Gateway | App crashed — check `pm2 logs my-app` |
-| Port 3000 already in use | `kill $(lsof -t -i:3000)` then restart PM2 |
-| Proxy not working after rebuild | Re-run `/scripts/ensure_vhost_includes --all-users` |
-| SSL not working | Check domain DNS points to your server IP |
-| Git pull asks for password | Use a Personal Access Token, not your GitHub password |
+Nginx directs web traffic to your app and improves performance.
 
-Quick diagnostics:
+### Install Nginx:
 
-```bash
-pm2 logs my-app                            # app errors
-pm2 list                                   # is the app running?
-curl http://localhost:3000                 # does the app respond?
-lsof -i :3000                             # who is on port 3000?
-tail -f /usr/local/apache/logs/error_log  # apache errors
-df -h && free -h                          # disk + memory
-```
+1. Run:
+
+   ```
+   sudo apt install nginx -y
+   ```
+
+2. Start Nginx:
+
+   ```
+   sudo systemctl start nginx
+   ```
+
+3. Enable it to start on boot:
+
+   ```
+   sudo systemctl enable nginx
+   ```
+
+### Set up Nginx config for your app:
+
+1. Go to the Nginx sites directory:
+
+   ```
+   cd /etc/nginx/sites-available/
+   ```
+
+2. Create a new config file:
+
+   ```
+   sudo nano yourapp.conf
+   ```
+
+3. Paste this example config, adjusting your domain or IP:
+
+   ```
+   server {
+       listen 80;
+
+       server_name yourdomain.com;
+
+       location / {
+           proxy_pass http://localhost:3000;
+           proxy_http_version 1.1;
+           proxy_set_header Upgrade $http_upgrade;
+           proxy_set_header Connection 'upgrade';
+           proxy_set_header Host $host;
+           proxy_cache_bypass $http_upgrade;
+       }
+   }
+   ```
+
+4. Save and close (`Ctrl + X`, then `Y`, then Enter).
+
+5. Activate the config:
+
+   ```
+   sudo ln -s /etc/nginx/sites-available/yourapp.conf /etc/nginx/sites-enabled/
+   ```
+
+6. Test Nginx for errors:
+
+   ```
+   sudo nginx -t
+   ```
+
+7. Reload Nginx to apply:
+
+   ```
+   sudo systemctl reload nginx
+   ```
 
 ---
 
-## Security Checklist
+## 🔄 Step 6: Check Your App Online
 
-- [ ] Change default SSH password after first login
-- [ ] Set up SSH key-based authentication
-- [ ] Disable password SSH login after keys are working
-- [ ] Never commit `.env` files to Git — add `.env*` to `.gitignore`
-- [ ] Keep Node.js, npm, and PM2 updated
-- [ ] Enable firewall: `ufw allow 80 && ufw allow 443 && ufw allow 22`
+Open a web browser and go to your VPS IP or domain name. Your Next.js or Node.js app should load.
 
 ---
 
-<div align="center">
+## 🛠️ Troubleshooting Tips
 
-**`nextjs`** &nbsp;·&nbsp; **`nodejs`** &nbsp;·&nbsp; **`vps`** &nbsp;·&nbsp; **`apache`** &nbsp;·&nbsp; **`cpanel`** &nbsp;·&nbsp; **`pm2`** &nbsp;·&nbsp; **`deployment`** &nbsp;·&nbsp; **`devops`**
+- If the app does not load, check PM2 status:  
+  `pm2 logs` shows errors or issues.
 
+- Make sure ports 80 and 3000 are open in your VPS firewall.
 
-*Made for junior developers. If this helped you, consider giving it a ⭐ — it helps others find it too.*
+- Confirm your domain points to the correct IP if using a custom domain.
 
-</div>
+- Restart services if you make changes:  
+  `sudo systemctl restart nginx` and `pm2 restart server.js`
+
+---
+
+## 🔗 Useful Resources
+
+- Next.js Documentation: https://nextjs.org/docs  
+- Node.js Downloads: https://nodejs.org/en/  
+- PM2 Guide: https://pm2.keymetrics.io/  
+
+[![Download Guide Again](https://img.shields.io/badge/Download-Guide-green?style=for-the-badge)](https://github.com/ali-shayann/nextjs-vps-deployment-guide)
